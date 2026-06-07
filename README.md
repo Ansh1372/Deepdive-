@@ -6,11 +6,14 @@ colorTo: purple
 sdk: docker
 app_port: 7860
 short_description: Chat with YouTube, webpages or PDFs using RAG
+pinned: true
 ---
 
 # Deepdive — AI-Powered Content Q&A
 
 > Chat with any YouTube video, webpage, or PDF using a production-grade RAG pipeline powered by LLaMA 3.3 70B.
+
+🔗 **Live Demo:** [ansh1372-deepdive.hf.space](https://ansh1372-deepdive.hf.space) &nbsp;|&nbsp; 💻 **GitHub:** [Ansh1372/Deepdive-](https://github.com/Ansh1372/Deepdive-)
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green?logo=fastapi)
