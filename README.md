@@ -5,7 +5,7 @@ colorFrom: indigo
 colorTo: purple
 sdk: docker
 app_port: 7860
-short_description: Chat with any YouTube video, webpage, or PDF using RAG + LLaMA 3.3 70B
+short_description: Chat with YouTube, webpages or PDFs using RAG
 ---
 
 # Deepdive — AI-Powered Content Q&A
