@@ -1,0 +1,282 @@
+.ingest-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ambient glow blobs behind the form */
+.ingest-form::before {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(129,140,248,0.07) 0%, transparent 70%);
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.ingest-form::after {
+  content: '';
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(167,139,250,0.06) 0%, transparent 70%);
+  bottom: 0;
+  right: 10%;
+  pointer-events: none;
+}
+
+/* ── Welcome heading ── */
+.ingest-welcome {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.ingest-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--grad-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin: 0 auto 1.25rem;
+  box-shadow: 0 8px 32px rgba(129,140,248,0.3), 0 0 0 1px rgba(129,140,248,0.2);
+}
+
+.ingest-welcome h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+  margin-bottom: 0.6rem;
+  line-height: 1.2;
+}
+
+.ingest-welcome h2 span {
+  background: var(--grad-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ingest-welcome p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* ── Input area ── */
+.ingest-input-area {
+  width: 100%;
+  max-width: 620px;
+  position: relative;
+  z-index: 1;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-lg);
+  padding: 0.5rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+
+.input-group:focus-within {
+  border-color: rgba(129,140,248,0.5);
+  box-shadow: 0 0 0 3px rgba(129,140,248,0.08), 0 4px 24px rgba(0,0,0,0.3);
+}
+
+.input-group input[type="text"] {
+  flex: 1;
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  outline: none;
+  font-family: inherit;
+}
+
+.input-group input[type="text"]::placeholder {
+  color: var(--text-dim);
+}
+
+/* Primary "Analyze" button */
+.input-group button[type="submit"] {
+  padding: 0.65rem 1.1rem;
+  border-radius: var(--radius-md);
+  border: none;
+  background: var(--grad-main);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: inherit;
+  box-shadow: 0 2px 12px rgba(129,140,248,0.35);
+}
+
+.input-group button[type="submit"]:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 18px rgba(129,140,248,0.5);
+  transform: translateY(-1px);
+}
+
+.input-group button[type="submit"]:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Upload button */
+.upload-btn {
+  padding: 0.65rem 0.85rem !important;
+  border-radius: var(--radius-md) !important;
+  border: 1px solid var(--border-hover) !important;
+  background: var(--bg-card) !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.8rem !important;
+  flex-shrink: 0;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500 !important;
+}
+
+.upload-btn:hover:not(:disabled) {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  background: var(--accent-dim) !important;
+}
+
+.upload-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Feature chips ── */
+.ingest-hints {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hint-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.hint-chip:hover {
+  border-color: var(--border-hover);
+  color: var(--text-secondary);
+}
+
+/* ── Loading bar ── */
+.ingest-progress {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ingest-progress-bar {
+  width: 100%;
+  height: 3px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.ingest-progress-fill {
+  height: 100%;
+  background: var(--grad-main);
+  border-radius: 99px;
+  animation: progress-shimmer 1.8s ease-in-out infinite;
+}
+
+@keyframes progress-shimmer {
+  0%   { width: 0%; margin-left: 0; }
+  50%  { width: 60%; margin-left: 20%; }
+  100% { width: 0%; margin-left: 100%; }
+}
+
+.ingest-progress-text {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  animation: pulse-text 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-text {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+
+/* ── Error ── */
+.error {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--error);
+  margin-top: 0.85rem;
+  font-size: 0.8rem;
+  text-align: center;
+  background: rgba(248,113,113,0.08);
+  border: 1px solid rgba(248,113,113,0.2);
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.75rem;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .ingest-form { padding: 1.5rem 1rem; justify-content: flex-start; padding-top: 3rem; }
+  .ingest-welcome h2 { font-size: 1.35rem; }
+  .ingest-welcome p  { font-size: 0.82rem; }
+
+  .input-group {
+    flex-wrap: wrap;
+    padding: 0.4rem;
+  }
+  .input-group input[type="text"] {
+    width: 100%;
+    flex: 1 1 100%;
+    font-size: 0.85rem;
+  }
+  .input-group button { flex: 1; font-size: 0.8rem; padding: 0.55rem 0.75rem; }
+  .ingest-hints { gap: 0.35rem; }
+  .hint-chip { font-size: 0.65rem; }
+}
+
+@media (max-width: 380px) {
+  .upload-btn { font-size: 0.7rem !important; padding: 0.5rem !important; }
+}

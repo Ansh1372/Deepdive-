@@ -1,0 +1,12 @@
+langchain>=0.2.0
+langchain-text-splitters
+langchain-groq
+langchain-community
+langchain-huggingface
+faiss-cpu
+youtube-transcript-api
+python-dotenv
+sentence-transformers
+trafilatura
+pdfplumber
+rank-bm25

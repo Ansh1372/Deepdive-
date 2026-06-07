@@ -1,0 +1,98 @@
+.source-panel {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  max-width: 740px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.source-toggle {
+  background: var(--bg-card);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  padding: 0.48rem 0.75rem;
+  font-size: 0.76rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  transition: all 0.2s;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.source-toggle:hover {
+  background: var(--bg-tertiary);
+  border-color: rgba(129,140,248,0.25);
+  color: var(--text-secondary);
+}
+
+.source-list {
+  margin-top: 0.45rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.source-item {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.8rem;
+  transition: border-color 0.2s;
+}
+
+.source-item:hover { border-color: var(--border-hover); }
+
+.source-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.source-badge {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid rgba(129,140,248,0.25);
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.6rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.source-url {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.source-content {
+  font-size: 0.77rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .source-toggle  { font-size: 0.72rem; padding: 0.42rem 0.6rem; }
+  .source-item    { padding: 0.5rem 0.65rem; }
+  .source-content { font-size: 0.72rem; -webkit-line-clamp: 2; }
+  .source-url     { font-size: 0.62rem; }
+}
