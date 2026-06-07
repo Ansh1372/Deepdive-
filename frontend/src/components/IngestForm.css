@@ -257,6 +257,32 @@
   padding: 0.5rem 0.75rem;
 }
 
+/* ── HuggingFace platform note ── */
+.hf-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  padding: 0.75rem 0.9rem;
+  background: rgba(251,191,36,0.06);
+  border: 1px solid rgba(251,191,36,0.2);
+  border-radius: var(--radius-md);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.hf-note-icon {
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+.hf-note strong {
+  color: #fbbf24;
+  font-weight: 600;
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .ingest-form { padding: 1.5rem 1rem; justify-content: flex-start; padding-top: 3rem; }

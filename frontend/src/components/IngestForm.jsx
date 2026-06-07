@@ -2,6 +2,9 @@ import { useState, useRef, useEffect } from 'react'
 import { ingestSource, uploadPdf } from '../api'
 import './IngestForm.css'
 
+// Detect if running on HuggingFace Spaces
+const IS_HF = typeof window !== 'undefined' && window.location.hostname.includes('hf.space')
+
 function IngestForm({ onComplete, isIngesting, setIsIngesting, reloadError, onClearReloadError }) {
   const [source, setSource] = useState('')
   const [error, setError] = useState(null)
@@ -118,6 +121,19 @@ function IngestForm({ onComplete, isIngesting, setIsIngesting, reloadError, onCl
             ⚠ {error}
             {reloadError && ' — click Analyze to retry'}
           </p>
+        )}
+
+        {/* HuggingFace platform note — only shown on hf.space */}
+        {IS_HF && (
+          <div className="hf-note">
+            <span className="hf-note-icon">ℹ️</span>
+            <div>
+              <strong>Note:</strong> YouTube URLs are not supported on this demo.
+              HuggingFace Spaces blocks outbound connections to YouTube for security reasons.
+              Use a <strong>webpage URL</strong> or <strong>PDF</strong> instead.
+              YouTube works fully on the self-hosted version.
+            </div>
+          </div>
         )}
       </div>
     </div>
