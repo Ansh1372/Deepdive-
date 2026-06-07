@@ -161,8 +161,8 @@ Streaming generation → token chunks + sources + pipeline metadata (SSE)
 
 ```bash
 # 1. Clone
-git clone https://github.com/YOUR_USERNAME/deepdive.git
-cd deepdive
+git clone https://github.com/Ansh1372/Deepdive-.git
+cd Deepdive-
 
 # 2. Set up environment
 cp .env.example .env
@@ -182,20 +182,7 @@ First build takes ~10 minutes (downloads ML models). Subsequent builds use cache
 
 ## Deploy on AWS EC2 (Free Tier)
 
-### 1. Launch EC2 instance
-
-- **AMI:** Ubuntu 22.04 LTS
-- **Instance type:** `t2.micro` (free tier) or `t3.small` (recommended — 2GB RAM)
-- **Storage:** 20 GB
-- **Security group inbound rules:**
-
-| Port | Source | Purpose |
-|------|--------|---------|
-| 22 | Your IP | SSH |
-| 80 | 0.0.0.0/0 | Frontend |
-| 8001 | 0.0.0.0/0 | Backend API |
-
-### 2. Install Docker
+### 1. Install Docker
 
 ```bash
 ssh -i your-key.pem ubuntu@<EC2-IP>
@@ -205,7 +192,7 @@ sudo usermod -aG docker ubuntu
 newgrp docker
 ```
 
-### 3. Add swap (required for t2.micro)
+### 2. Add swap (required for t2.micro)
 
 ```bash
 sudo fallocate -l 2G /swapfile
@@ -215,11 +202,11 @@ sudo swapon /swapfile
 echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 ```
 
-### 4. Deploy
+### 3. Deploy
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/deepdive.git
-cd deepdive
+git clone https://github.com/Ansh1372/Deepdive-.git
+cd Deepdive-
 
 cp .env.example .env
 nano .env  # add GROQ_API_KEY and GEMINI_API_KEY
@@ -227,11 +214,11 @@ nano .env  # add GROQ_API_KEY and GEMINI_API_KEY
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-### 5. Access
+### 4. Access
 
 Open `http://<EC2-PUBLIC-IP>` in your browser.
 
-### Update
+### 5. Update
 
 ```bash
 git pull
