@@ -180,53 +180,6 @@ First build takes ~10 minutes (downloads ML models). Subsequent builds use cache
 
 ---
 
-## Deploy on AWS EC2 (Free Tier)
-
-### 1. Install Docker
-
-```bash
-ssh -i your-key.pem ubuntu@<EC2-IP>
-
-curl -fsSL https://get.docker.com | sh
-sudo usermod -aG docker ubuntu
-newgrp docker
-```
-
-### 2. Add swap (required for t2.micro)
-
-```bash
-sudo fallocate -l 2G /swapfile
-sudo chmod 600 /swapfile
-sudo mkswap /swapfile
-sudo swapon /swapfile
-echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-```
-
-### 3. Deploy
-
-```bash
-git clone https://github.com/Ansh1372/Deepdive-.git
-cd Deepdive-
-
-cp .env.example .env
-nano .env  # add GROQ_API_KEY and GEMINI_API_KEY
-
-docker compose -f docker-compose.prod.yml up -d --build
-```
-
-### 4. Access
-
-Open `http://<EC2-PUBLIC-IP>` in your browser.
-
-### 5. Update
-
-```bash
-git pull
-docker compose -f docker-compose.prod.yml up -d --build
-```
-
----
-
 ## API Reference
 
 | Method | Endpoint | Description |
