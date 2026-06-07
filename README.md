@@ -4,12 +4,12 @@
 
 🔗 **Live Demo:** [ansh1372-deepdive.hf.space](https://ansh1372-deepdive.hf.space) &nbsp;|&nbsp; 💻 **GitHub:** [Ansh1372/Deepdive-](https://github.com/Ansh1372/Deepdive-)
 
-![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green?logo=fastapi)
-![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)
-![Redis](https://img.shields.io/badge/Redis-7-red?logo=redis)
-![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)
-![License](https://img.shields.io/badge/License-MIT-yellow)
+![Python](https://img.shields.io/badge/Python-3.10-3776AB?style=flat&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=flat&logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=black)
+![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=flat&logo=redis&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-yellow?style=flat)
 
 ---
 
@@ -26,8 +26,6 @@ When the ingested content isn't enough to answer your question, the system autom
 | Ingest a source | Chat with it |
 |:---:|:---:|
 | Paste any URL or upload PDF | Ask specific questions, get streamed answers with sources |
-
-> **Live demo:** `http://YOUR-EC2-IP` ← replace after deploying
 
 ---
 
