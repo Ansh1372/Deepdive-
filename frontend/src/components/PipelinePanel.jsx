@@ -1,16 +1,32 @@
 import { useState } from 'react'
 import './PipelinePanel.css'
 
-function getConfidenceLevel(score) {
-  // Raw CrossEncoder scores: typically -10 to +10
-  // Threshold is 5.0 — below that triggers web search
-  if (score >= 7) return { label: 'High', className: 'confidence-high' }
-  if (score >= 5) return { label: 'Medium', className: 'confidence-medium' }
-  return { label: 'Low', className: 'confidence-low' }
+/**
+ * Badge confidence is based on the ACTUAL answer outcome, not the raw
+ * cross-encoder score. The reranker score is a technical retrieval metric
+ * that is low for vague/open-ended queries even when the answer is good.
+ *
+ * Logic:
+ *  - Web search was triggered + found content → MEDIUM (answer supplemented from web)
+ *  - Web search was triggered + nothing useful → LOW (couldn't find a good answer)
+ *  - Answer came entirely from ingested document (sufficiency passed) → HIGH
+ */
+function getOutcomeConfidence(pipeline) {
+  if (pipeline.web_augmented) {
+    // Web search was used — answer is partially from web, not purely from document
+    return { label: 'Medium', className: 'confidence-medium' }
+  }
+  // Check if sufficiency check explicitly failed (web search attempted but found nothing)
+  const sufficiencyStep = pipeline.steps?.find(s => s.name === 'Context Sufficiency Check')
+  if (sufficiencyStep && sufficiencyStep.detail?.includes('Insufficient')) {
+    return { label: 'Low', className: 'confidence-low' }
+  }
+  // Sufficiency passed, answered from document
+  return { label: 'High', className: 'confidence-high' }
 }
 
 function normalizeConfidence(score) {
-  // Map raw score (-5 to 10) to 0-100% for the bar
+  // Map raw reranker score (-5 to 10) to 0-100% for the internal bar
   const normalized = Math.max(0, Math.min(100, ((score + 5) / 15) * 100))
   return normalized
 }
@@ -20,8 +36,8 @@ function PipelinePanel({ pipeline }) {
 
   if (!pipeline) return null
 
-  const confidence = pipeline.confidence
-  const confidenceInfo = confidence !== undefined ? getConfidenceLevel(confidence) : null
+  const rawScore = pipeline.confidence          // reranker score — for the internal bar
+  const outcomeInfo = getOutcomeConfidence(pipeline)  // outcome badge — what user sees
 
   return (
     <div className="pipeline-panel">
@@ -31,11 +47,9 @@ function PipelinePanel({ pipeline }) {
       >
         <span className="pipeline-toggle-left">
           ⚡ Pipeline: {pipeline.total_time}s ({pipeline.steps.length} steps)
-          {confidenceInfo && (
-            <span className={`confidence-badge ${confidenceInfo.className}`}>
-              {confidenceInfo.label} confidence
-            </span>
-          )}
+          <span className={`confidence-badge ${outcomeInfo.className}`}>
+            {outcomeInfo.label} confidence
+          </span>
           {pipeline.web_augmented && (
             <span className="web-badge">🌐 Web augmented</span>
           )}
@@ -45,17 +59,17 @@ function PipelinePanel({ pipeline }) {
 
       {expanded && (
         <div className="pipeline-details">
-          {confidenceInfo && (
+          {rawScore !== undefined && (
             <div className="confidence-bar-container">
-              <span className="label">Retrieval Confidence:</span>
+              <span className="label">Retrieval Score:</span>
               <div className="confidence-bar-bg">
                 <div
-                  className={`confidence-bar-fill ${confidenceInfo.className}`}
-                  style={{ width: `${normalizeConfidence(confidence)}%` }}
+                  className={`confidence-bar-fill ${outcomeInfo.className}`}
+                  style={{ width: `${normalizeConfidence(rawScore)}%` }}
                 />
               </div>
-              <span className={`confidence-score ${confidenceInfo.className}`}>
-                {confidence.toFixed(1)}
+              <span className={`confidence-score ${outcomeInfo.className}`}>
+                {rawScore.toFixed(1)}
               </span>
             </div>
           )}
