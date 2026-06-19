@@ -84,7 +84,7 @@ Here is the Source Document Context:
             target_file = generated_files[0]
             
             # Download it to our local backend/downloads folder
-            file_bytes = sandbox.files.read(target_file.path)
+            file_bytes = sandbox.files.read(target_file.path, format="bytes")
             
             # Give it a unique name to prevent collisions
             unique_filename = f"{uuid.uuid4().hex[:8]}_{target_file.name}"
