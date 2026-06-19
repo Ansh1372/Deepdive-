@@ -7,6 +7,7 @@ import traceback
 from fastapi import FastAPI, HTTPException, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -33,6 +34,11 @@ app = FastAPI(title="Deepdive API", version="1.0.0")
 # Rate limiter
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Mount downloads directory
+DOWNLOADS_DIR = os.path.join(os.path.dirname(__file__), "downloads")
+os.makedirs(DOWNLOADS_DIR, exist_ok=True)
+app.mount("/downloads", StaticFiles(directory=DOWNLOADS_DIR), name="downloads")
 
 
 # Global exception handler
@@ -319,6 +325,55 @@ def chat(request: Request, body: ChatRequest):
 
     # Format chat history
     history_str = _format_history(chat_history)
+
+    # ---------------------------------------------------------
+    # Intent Classifier: Does the user want a file/report generated?
+    # ---------------------------------------------------------
+    logger.info("[CHAT] Intent Classification")
+    from backend.generation.chain import get_llm
+    intent_llm = get_llm()
+    intent_prompt = f"""Is the user asking to generate, download, create, or output a file, report, spreadsheet, or PDF?
+User Question: "{body.question}"
+Reply ONLY with the exact word 'FILE' or 'CHAT'."""
+    try:
+        intent_resp = intent_llm.invoke(intent_prompt)
+        intent = intent_resp.content.strip().upper()
+    except Exception as e:
+        logger.error(f"[CHAT][{request_id}] Intent classification failed: {e}")
+        intent = "CHAT"
+        
+    if "FILE" in intent:
+        logger.info(f"[CHAT][{request_id}] User intent is FILE. Delegating to Agent.")
+        from backend.generation.agent import generate_and_run_script
+        
+        # Build context from retriever (we do a quick retrieval for the agent)
+        quick_docs = retriever.invoke(body.question)
+        agent_context = "\n\n".join(doc.page_content for doc in quick_docs)
+        
+        # Call agent
+        agent_response = generate_and_run_script(body.question, agent_context, history_str)
+        
+        # Stream the agent response back as a normal chat message
+        def agent_stream():
+            import json as json_lib
+            yield f"data: {agent_response.replace(chr(10), '\\n')}\n\n"
+            
+            # Send empty sources and pipeline to satisfy frontend
+            yield f"event: sources\ndata: {json_lib.dumps([])}\n\n"
+            pipeline["steps"].append({"name": "Agentic Execution (E2B)", "time": 0, "detail": "File generated"})
+            yield f"event: pipeline\ndata: {json_lib.dumps(pipeline)}\n\n"
+            yield "data: [DONE]\n\n"
+            
+            # Save history
+            with session.get("lock", threading.Lock()):
+                chat_history.append({"role": "human", "content": body.question})
+                chat_history.append({"role": "assistant", "content": agent_response})
+                updated_history = chat_history[-10:]
+                session["chat_history"] = updated_history
+                save_chat_history(body.session_id, updated_history)
+
+        return StreamingResponse(agent_stream(), media_type="text/event-stream")
+    # ---------------------------------------------------------
 
     # Query rewriting
     logger.info("[CHAT] Step 1: Query rewriting")

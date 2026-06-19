@@ -10,3 +10,7 @@ trafilatura
 pdfplumber
 rank-bm25
 google-genai
+e2b_code_interpreter
+pandas
+openpyxl
+matplotlib
