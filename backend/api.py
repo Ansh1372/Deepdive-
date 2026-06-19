@@ -356,7 +356,8 @@ Reply ONLY with the exact word 'FILE' or 'CHAT'."""
         # Stream the agent response back as a normal chat message
         def agent_stream():
             import json as json_lib
-            yield f"data: {agent_response.replace(chr(10), '\\n')}\n\n"
+            formatted_response = agent_response.replace("\n", "\\n")
+            yield f"data: {formatted_response}\n\n"
             
             # Send empty sources and pipeline to satisfy frontend
             yield f"event: sources\ndata: {json_lib.dumps([])}\n\n"
