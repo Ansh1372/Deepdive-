@@ -6,7 +6,7 @@ langchain-groq==0.2.2
 langchain-community==0.3.9
 langchain-huggingface==0.1.2
 faiss-cpu==1.9.0
-youtube-transcript-api==0.6.3
+faiss-cpu==1.9.0
 python-dotenv==1.0.1
 redis==5.2.1
 # CPU-only torch — avoids downloading 2GB+ CUDA libraries in Docker
@@ -23,3 +23,7 @@ ragas==0.2.8
 datasets==3.2.0
 slowapi==0.1.9
 requests==2.32.3
+e2b_code_interpreter
+pandas
+openpyxl
+matplotlib
