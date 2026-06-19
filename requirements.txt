@@ -4,9 +4,9 @@ langchain-groq
 langchain-community
 langchain-huggingface
 faiss-cpu
-youtube-transcript-api
 python-dotenv
 sentence-transformers
 trafilatura
 pdfplumber
 rank-bm25
+google-genai

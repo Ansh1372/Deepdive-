@@ -1,56 +1,39 @@
-from youtube_transcript_api import YouTubeTranscriptApi
-
+import os
+from google import genai
 
 def get_youtube_transcript(video_url: str) -> str:
-    """Extract transcript from YouTube URL or video ID."""
-    if "youtube.com" in video_url or "youtu.be" in video_url:
-        if "v=" in video_url:
-            video_id = video_url.split("v=")[1].split("&")[0]
-        elif "youtu.be/" in video_url:
-            video_id = video_url.split("youtu.be/")[1].split("?")[0]
-        else:
-            video_id = video_url
-    else:
-        video_id = video_url
+    """Extract transcript or detailed summary from YouTube using Gemini."""
+    # Ensure it's a full URL so Gemini can access it
+    url = video_url
+    if "youtube.com" not in url and "youtu.be" not in url:
+        url = f"https://www.youtube.com/watch?v={video_url}"
+
+    api_key = os.getenv("GEMINI_API_KEY", "")
+    if not api_key:
+        raise ValueError(
+            "GEMINI_API_KEY environment variable is not set. "
+            "Please provide a Gemini API key to enable YouTube processing."
+        )
 
     try:
-        # youtube-transcript-api 0.6.x — try English first, then any language
-        try:
-            transcript_list = YouTubeTranscriptApi.get_transcript(
-                video_id,
-                languages=["en", "en-US", "en-GB", "a.en"],
-            )
-        except Exception:
-            transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
+        client = genai.Client(api_key=api_key)
+        
+        prompt = (
+            f"Please provide a full, detailed transcript for this YouTube video. "
+            f"If a transcript is not available, provide a very detailed summary "
+            f"of all the information spoken and shown in the video. Video URL: {url}"
+        )
 
-        return " ".join(snippet["text"] for snippet in transcript_list)
+        result = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[prompt]
+        )
+        
+        text = result.text.strip()
+        if not text:
+            raise ValueError("Gemini returned an empty response.")
+            
+        return text
 
     except Exception as e:
-        err_str = str(e).lower()
-
-        # Network / SSL errors — typically a platform firewall blocking YouTube
-        if any(x in err_str for x in ["ssl", "connectionpool", "max retries", "eof", "network", "timeout"]):
-            raise ValueError(
-                "YouTube is not accessible from this server. "
-                "Try pasting a webpage URL or uploading a PDF instead."
-            )
-
-        # Video has no transcript / captions disabled
-        if any(x in err_str for x in ["transcript", "disabled", "no transcript", "could not retrieve"]):
-            raise ValueError(
-                "This video has no captions or transcripts available. "
-                "Try a video that has subtitles enabled, or use a webpage/PDF."
-            )
-
-        # Video is private, age-restricted, or unavailable
-        if any(x in err_str for x in ["private", "unavailable", "not available", "age"]):
-            raise ValueError(
-                "This video is private, age-restricted, or unavailable. "
-                "Please try a different video."
-            )
-
-        # Generic fallback
-        raise ValueError(
-            f"Could not fetch transcript for this video. "
-            f"Try a different video or use a webpage/PDF instead. ({type(e).__name__})"
-        )
+        raise ValueError(f"Could not process YouTube video with Gemini. Try another video or a webpage/PDF. ({type(e).__name__}: {str(e)})")
