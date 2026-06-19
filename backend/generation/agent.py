@@ -63,7 +63,7 @@ Here is the Source Document Context:
 
     # 3. Run in E2B Sandbox
     try:
-        with Sandbox(api_key=e2b_api_key) as sandbox:
+        with Sandbox() as sandbox:
             execution = sandbox.run_code(code)
             
             if execution.error:
