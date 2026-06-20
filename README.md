@@ -49,14 +49,16 @@ When the ingested content isn't enough to answer your question, the system autom
 │     FAISS vectorstore (saved per session to disk)       │
 │                                                         │
 │  /chat ───► 1. Guardrail check (blocklist + LLM)        │
-│             2. Query rewriting (LLM)                    │
-│             3. Multi-query fan-out (3 variations)       │
-│             4. Hybrid retrieval (FAISS + BM25, merged)  │
-│             5. Cross-encoder reranking                  │
-│             6. Contextual compression (LLM per chunk)   │
-│             7. Sufficiency check → web search fallback  │
-│             8. Streaming generation (LLaMA 3.3 70B)     │
-│                                                         │
+│             2. Intent Classifier (CHAT vs FILE)         │
+│               ├─ IF CHAT: RAG Pipeline                  │
+│               │   3. Query rewriting (LLM)              │
+│               │   4. Multi-query fan-out (3 variations) │
+│               │   5. Hybrid retrieval & Reranking       │
+│               │   6. Streaming generation (LLM)         │
+│               └─ IF FILE: LangGraph Agent               │
+│                   └─ E2B Code Interpreter Sandbox       │
+│                      (Writes Python script & generates  │
+│                       Excel/CSV/PDF dynamically)        │
 └──────────┬──────────────────────────┬───────────────────┘
            │                          │
     ┌──────▼──────┐          ┌────────▼────────┐
@@ -79,7 +81,8 @@ When the ingested content isn't enough to answer your question, the system autom
 | Vector Store | FAISS CPU (per-session, disk-persisted) |
 | Keyword Search | BM25 (`rank-bm25`) |
 | Reranker | `cross-encoder/ms-marco-MiniLM-L-6-v2` |
-| Orchestration | LangChain |
+| Orchestration | LangChain & LangGraph |
+| Code Interpreter | E2B Data Analysis Sandboxes |
 | Session Storage | Redis (chat history, 24h TTL) |
 | YouTube | `youtube-transcript-api` |
 | Web Scraping | Trafilatura |
@@ -138,6 +141,7 @@ Streaming generation → token chunks + sources + pipeline metadata (SSE)
 ## Features
 
 - **Multi-source ingestion** — YouTube, webpages, PDFs, with image understanding via Gemini Vision
+- **Agentic Code Interpreter (LangGraph + E2B)** — Automatically writes and executes Python scripts in cloud sandboxes to generate Excel, CSV, or PDF reports based on your data.
 - **Hybrid retrieval** — FAISS semantic + BM25 keyword, merged and deduplicated
 - **Cross-encoder reranking** — significantly higher precision than bi-encoder dot-product
 - **Agentic web fallback** — LLM decides when to search the web, no manual toggle
