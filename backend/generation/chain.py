@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
@@ -8,7 +8,7 @@ load_dotenv()
 
 
 def get_llm():
-    return ChatGroq(model="llama-3.1-8b-instant", temperature=0.2, max_tokens=8192)
+    return ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.2, max_tokens=2048)
 
 
 def build_chain():
