@@ -1,9 +1,11 @@
 import os
 import re
 import uuid
+from typing import TypedDict, Optional
 from backend.utils.logger import get_logger
 from backend.generation.chain import get_llm
 from langchain_core.messages import HumanMessage, SystemMessage
+from langgraph.graph import StateGraph, END
 
 try:
     from e2b_code_interpreter import Sandbox
@@ -16,17 +18,19 @@ logger = get_logger("agent")
 DOWNLOADS_DIR = os.path.join(os.path.dirname(__file__), "..", "downloads")
 os.makedirs(DOWNLOADS_DIR, exist_ok=True)
 
-def generate_and_run_script(prompt: str, context: str, chat_history: str) -> str:
-    """Uses LLM to write a Python script, runs it in E2B, and returns a download link."""
-    
-    e2b_api_key = os.getenv("E2B_API_KEY")
-    if not Sandbox or not e2b_api_key:
-        logger.error("E2B Sandbox is not configured properly.")
-        return "Sorry, the secure code execution environment is not configured (missing E2B_API_KEY)."
+class AgentState(TypedDict):
+    prompt: str
+    context: str
+    chat_history: str
+    code: Optional[str]
+    error: Optional[str]
+    iterations: int
+    final_response: Optional[str]
 
+def generate_code_node(state: AgentState):
     llm = get_llm()
+    logger.info(f"[AGENT] Generating code (Iteration {state['iterations'] + 1})")
     
-    # 1. Ask LLM to write the Python script
     system_prompt = """You are an expert Python data analyst and developer.
 Your task is to write a Python script that generates a highly-formatted file (e.g. Excel, CSV, PDF, Word docx, Markdown) based on the user's explicit request.
 
@@ -45,67 +49,103 @@ Here is the entire Chat History up to this point:
 Here is the Source Document Context:
 {context}
 """
-
-    user_prompt = f"User Request: {prompt}\n\nPlease write the complete Python script to generate this file."
-
-    logger.info("[AGENT] Generating Python script...")
+    user_prompt = f"User Request: {state['prompt']}\n\nPlease write the complete Python script to generate this file."
+    
+    if state.get("error"):
+        user_prompt += f"\n\nCRITICAL: Your previous code execution FAILED with the following error:\n{state['error']}\n\nPlease analyze the error, fix your code, and try again. Output the full corrected code."
+        
     response = llm.invoke([
-        SystemMessage(content=system_prompt.format(chat_history=chat_history, context=context)),
+        SystemMessage(content=system_prompt.format(chat_history=state["chat_history"], context=state["context"])),
         HumanMessage(content=user_prompt)
     ])
-    logger.info(f"[AGENT] Raw LLM Response:\n{response.content}\n-----------------------")
     
     if "REJECT: OUT_OF_CONTEXT" in response.content.upper():
         logger.warning("[AGENT] Rejected out of context request.")
-        return "I can only generate files and reports based on the content you uploaded. Please ask a question related to the source document."
+        return {"final_response": "I can only generate files and reports based on the content you uploaded. Please ask a question related to the source document."}
 
-    # 2. Extract code
     code_match = re.search(r'```python\n(.*?)\n```', response.content, re.DOTALL)
     if not code_match:
-        # Fallback if no markdown block
         code = response.content.replace('```python', '').replace('```', '').strip()
     else:
         code = code_match.group(1).strip()
         
-    logger.info(f"[AGENT] Extracted script ({len(code)} bytes):\n{code}\nRunning in E2B Sandbox...")
+    return {"code": code}
 
-    # 3. Run in E2B Sandbox
+def execute_code_node(state: AgentState):
+    logger.info("[AGENT] Executing code in Sandbox...")
+    e2b_api_key = os.getenv("E2B_API_KEY")
+    if not Sandbox or not e2b_api_key:
+        return {"error": "E2B Sandbox is not configured properly.", "iterations": state["iterations"] + 1}
+        
     try:
         with Sandbox.create() as sandbox:
-            execution = sandbox.run_code(code)
+            execution = sandbox.run_code(state["code"])
             
             if execution.error:
-                logger.error(f"[AGENT] E2B Execution Error: {execution.error.name} - {execution.error.value}")
-                return f"Sorry, there was an error generating the report: {execution.error.value}"
+                error_msg = f"{execution.error.name}: {execution.error.value}"
+                logger.warning(f"[AGENT] E2B Error: {error_msg}")
+                return {"error": error_msg, "iterations": state["iterations"] + 1}
                 
-            # 4. Find the generated file
             files = sandbox.files.list("/home/user")
-            
-            # Filter out hidden files or standard python files
             generated_files = [f for f in files if not f.name.startswith('.') and not f.name.endswith('.py')]
             
             if not generated_files:
-                logger.warning("[AGENT] Script executed but no file was generated.")
-                return "The report generation completed, but no file was created."
+                error_msg = "Script executed but no file was generated in the current working directory."
+                logger.warning(f"[AGENT] {error_msg}")
+                return {"error": error_msg, "iterations": state["iterations"] + 1}
                 
-            # Grab the most recently modified or just the first generated file
             target_file = generated_files[0]
-            
-            # Download it to our local backend/downloads folder
             file_bytes = sandbox.files.read(target_file.path, format="bytes")
             
-            # Give it a unique name to prevent collisions
             unique_filename = f"{uuid.uuid4().hex[:8]}_{target_file.name}"
             local_path = os.path.join(DOWNLOADS_DIR, unique_filename)
             
             with open(local_path, "wb") as f:
                 f.write(file_bytes)
                 
-            logger.info(f"[AGENT] File downloaded successfully: {unique_filename}")
-            
-            # Return the markdown link
-            return f"Your report has been generated successfully! \n\n[Download {target_file.name} here](http://localhost:8001/downloads/{unique_filename})"
+            final_response = f"Your report has been generated successfully! \n\n[Download {target_file.name} here](http://localhost:8001/downloads/{unique_filename})"
+            return {"final_response": final_response, "error": None}
             
     except Exception as e:
-        logger.error(f"[AGENT] Sandbox connection/execution failed: {e}")
-        return "An error occurred while connecting to the secure sandbox environment."
+        logger.error(f"[AGENT] Sandbox exception: {e}")
+        return {"error": str(e), "iterations": state["iterations"] + 1}
+
+def should_continue(state: AgentState):
+    if state.get("final_response"):
+        return END
+    if state["iterations"] >= 3:
+        return END
+    return "generate_code"
+
+# Compile graph
+workflow = StateGraph(AgentState)
+workflow.add_node("generate_code", generate_code_node)
+workflow.add_node("execute_code", execute_code_node)
+
+workflow.set_entry_point("generate_code")
+workflow.add_conditional_edges("generate_code", lambda x: "execute_code" if not x.get("final_response") else END)
+workflow.add_conditional_edges("execute_code", should_continue)
+
+agent_app = workflow.compile()
+
+def generate_and_run_script(prompt: str, context: str, chat_history: str) -> str:
+    """Invokes the LangGraph state machine to generate and run a script."""
+    initial_state = {
+        "prompt": prompt,
+        "context": context,
+        "chat_history": chat_history,
+        "code": None,
+        "error": None,
+        "iterations": 0,
+        "final_response": None
+    }
+    
+    logger.info("[AGENT] Starting LangGraph Agent")
+    final_state = agent_app.invoke(initial_state)
+    
+    if final_state.get("final_response"):
+        return final_state["final_response"]
+    elif final_state.get("error"):
+        return f"Sorry, there was an error generating the report after {final_state['iterations']} attempts: {final_state['error']}"
+    else:
+        return "Unknown error occurred during generation."
