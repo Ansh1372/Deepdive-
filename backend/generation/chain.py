@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -7,9 +8,32 @@ from langchain_core.output_parsers import StrOutputParser
 load_dotenv()
 
 
-def get_llm():
-    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-    return ChatGoogleGenerativeAI(model="gemini-flash-latest", temperature=0.2, max_output_tokens=8192, google_api_key=api_key)
+def get_llm(purpose="heavy"):
+    """
+    Returns an LLM depending on the purpose to save tokens and speed up background tasks.
+    purpose="heavy": For complex reasoning (Main chat, Agent coding) -> uses LLaMA 3.3 70B
+    purpose="fast": For quick classification/routing -> uses LLaMA 3.1 8B
+    """
+    groq_api_key = os.getenv("GROQ_API_KEY")
+    
+    if groq_api_key:
+        if purpose == "fast":
+            model_name = "llama-3.1-8b-instant"
+            temperature = 0.1
+        else:
+            model_name = "llama-3.3-70b-versatile"
+            temperature = 0.2
+            
+        return ChatGroq(
+            model=model_name,
+            temperature=temperature,
+            max_tokens=8000,
+            groq_api_key=groq_api_key
+        )
+    else:
+        # Fallback to Gemini if no Groq key
+        api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        return ChatGoogleGenerativeAI(model="gemini-flash-latest", temperature=0.2, max_output_tokens=8192, google_api_key=api_key)
 
 
 def build_chain():

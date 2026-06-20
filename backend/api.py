@@ -331,7 +331,7 @@ def chat(request: Request, body: ChatRequest):
     # ---------------------------------------------------------
     logger.info("[CHAT] Intent Classification")
     from backend.generation.chain import get_llm
-    intent_llm = get_llm()
+    intent_llm = get_llm("fast")
     intent_prompt = f"""Is the user asking to generate, download, create, or output a file, report, spreadsheet, or PDF?
 User Question: "{body.question}"
 Reply ONLY with the exact word 'FILE' or 'CHAT'."""
@@ -456,7 +456,7 @@ Reply ONLY with the exact word 'FILE' or 'CHAT'."""
     context_for_check = "\n\n".join(doc.page_content for doc in compressed_docs)
 
     t0 = time.time()
-    sufficiency_llm = get_llm()
+    sufficiency_llm = get_llm("fast")
     sufficiency_prompt = f"""You are a STRICT factual validator. Check if the context EXPLICITLY contains the answer to the question.
 
 RULES:
@@ -587,7 +587,7 @@ def _summarize_chat_history(history):
     
     from backend.generation.chain import get_llm
     from langchain_core.messages import HumanMessage
-    llm = get_llm()
+    llm = get_llm("fast")
     
     old_messages = history[:-4]
     recent_messages = history[-4:]

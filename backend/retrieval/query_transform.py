@@ -7,7 +7,7 @@ logger = get_logger("query_transform")
 def rewrite_query(question: str, chat_history: str) -> str:
     """Rewrite user question into a better search query using context."""
     logger.info(f"Rewriting query: '{question}'")
-    llm = get_llm()
+    llm = get_llm("fast")
     prompt = f"""Given the conversation history and the user's question, 
 rewrite it into a clear, standalone search query optimized for retrieval.
 Fix any spelling mistakes or typos in the question.
@@ -27,7 +27,7 @@ Rewritten query:"""
 def generate_multi_queries(question: str) -> list:
     """Generate 3 different versions of the question for broader retrieval."""
     logger.info(f"Generating multi-queries from: '{question}'")
-    llm = get_llm()
+    llm = get_llm("fast")
     prompt = f"""Generate 3 different versions of this question to improve search coverage.
 Each version should use different words but mean the same thing.
 Return only the 3 questions, one per line. No numbering.

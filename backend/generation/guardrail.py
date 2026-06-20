@@ -57,7 +57,7 @@ def check_guardrail(question: str) -> dict:
         }
 
     # Step 4: LLM check for edge cases
-    llm = get_llm()
+    llm = get_llm("fast")
     prompt = f"""You are a content safety classifier. Determine if this user question is appropriate for a document Q&A system.
 
 The system answers questions about content the user has uploaded (articles, videos, PDFs).
