@@ -369,7 +369,7 @@ Reply ONLY with the exact word 'FILE' or 'CHAT'."""
             with session.get("lock", threading.Lock()):
                 chat_history.append({"role": "human", "content": body.question})
                 chat_history.append({"role": "assistant", "content": agent_response})
-                updated_history = chat_history[-10:]
+                updated_history = _summarize_chat_history(chat_history)
                 session["chat_history"] = updated_history
                 save_chat_history(body.session_id, updated_history)
 
@@ -536,7 +536,7 @@ Is the SPECIFIC answer explicitly written in the context above? Reply ONLY: "SUF
         with session.get("lock", threading.Lock()):
             chat_history.append({"role": "human", "content": body.question})
             chat_history.append({"role": "assistant", "content": full_answer})
-            updated_history = chat_history[-10:]
+            updated_history = _summarize_chat_history(chat_history)
             session["chat_history"] = updated_history
             # Persist to Redis so history survives container restarts
             save_chat_history(body.session_id, updated_history)
@@ -578,3 +578,29 @@ def _format_history(history):
         role = "Human" if msg["role"] == "human" else "Assistant"
         lines.append(f"{role}: {msg['content']}")
     return "\n".join(lines)
+
+def _summarize_chat_history(history):
+    """Summarizes older conversation history to save tokens while preserving context."""
+    # Keep last 2 pairs (4 messages) intact, summarize the rest if history gets too long (>6 messages)
+    if len(history) <= 6:
+        return history
+    
+    from backend.generation.chain import get_llm
+    from langchain_core.messages import HumanMessage
+    llm = get_llm()
+    
+    old_messages = history[:-4]
+    recent_messages = history[-4:]
+    
+    old_text = _format_history(old_messages)
+    prompt = f"Summarize the following older conversation history concisely, preserving all key context, facts, and topics discussed:\n\n{old_text}"
+    
+    try:
+        summary_resp = llm.invoke([HumanMessage(content=prompt)])
+        summary = summary_resp.content.strip()
+    except Exception as e:
+        logger.error(f"Summarization failed: {e}")
+        # Fallback to truncating if LLM summary fails
+        return history[-6:]
+        
+    return [{"role": "assistant", "content": f"[Summary of previous conversation]: {summary}"}] + recent_messages
