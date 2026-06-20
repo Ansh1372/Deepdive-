@@ -15,25 +15,35 @@ def get_llm(purpose="heavy"):
     purpose="fast": For quick classification/routing -> uses LLaMA 3.1 8B
     """
     groq_api_key = os.getenv("GROQ_API_KEY")
+    gemini_api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     
+    # Define fallback model
+    gemini_fallback = None
+    if gemini_api_key:
+        gemini_fallback = ChatGoogleGenerativeAI(model="gemini-flash-latest", temperature=0.2, max_output_tokens=8192, google_api_key=gemini_api_key)
+
     if groq_api_key:
         if purpose == "fast":
             model_name = "llama-3.1-8b-instant"
             temperature = 0.1
         else:
-            model_name = "llama-3.3-70b-versatile"
+            model_name = "llama-3.1-8b-instant"
             temperature = 0.2
             
-        return ChatGroq(
+        groq_model = ChatGroq(
             model=model_name,
             temperature=temperature,
-            max_tokens=8000,
+            max_tokens=1024,
             groq_api_key=groq_api_key
         )
+        
+        # If Gemini is configured, use it as a safety net for rate limits
+        if gemini_fallback:
+            return groq_model.with_fallbacks([gemini_fallback])
+            
+        return groq_model
     else:
-        # Fallback to Gemini if no Groq key
-        api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-        return ChatGoogleGenerativeAI(model="gemini-flash-latest", temperature=0.2, max_output_tokens=8192, google_api_key=api_key)
+        return gemini_fallback
 
 
 def build_chain():

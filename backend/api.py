@@ -596,6 +596,7 @@ def _summarize_chat_history(history):
     prompt = f"Summarize the following older conversation history concisely, preserving all key context, facts, and topics discussed:\n\n{old_text}"
     
     try:
+        logger.info(f"Summarizing older conversation history ({len(old_messages)} messages) to save tokens...")
         summary_resp = llm.invoke([HumanMessage(content=prompt)])
         summary = summary_resp.content.strip()
     except Exception as e:

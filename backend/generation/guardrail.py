@@ -33,7 +33,7 @@ def check_guardrail(question: str) -> dict:
 
     # Step 1: Keyword blocklist (instant)
     for keyword in BLOCKED_KEYWORDS:
-        if keyword in question_lower:
+        if re.search(r'\b' + re.escape(keyword) + r'\b', question_lower):
             logger.warning(f"BLOCKED by keyword: '{keyword}'")
             return {
                 "allowed": False,
