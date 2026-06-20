@@ -15,6 +15,8 @@ def get_youtube_transcript(video_url: str) -> str:
             'skip_download': True,
             'quiet': True,
             'no_warnings': True,
+            'extractor_retries': 1,
+            'socket_timeout': 10,
         }
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:

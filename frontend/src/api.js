@@ -13,6 +13,7 @@ async function parseError(res, fallback) {
   if (res.status === 404) return "Session expired — please re-ingest your source.";
   if (res.status === 429) return "Rate limit reached — wait a moment and try again.";
   if (res.status === 503 || res.status === 502) return "Backend is starting up — please wait a few seconds and retry.";
+  if (res.status === 504) return "Video processing timed out. It might be blocked or have no transcript. Try another video.";
   return `${fallback} (${res.status})`;
 }
 
