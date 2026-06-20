@@ -34,9 +34,10 @@ Requirements:
 1. Pay close attention to the EXACT file format the user requests (e.g., if they ask for a PDF, generate a .pdf; if Word, generate .docx; if Excel, generate .xlsx).
 2. If you need third-party libraries (like `python-docx` for Word, `fpdf2` or `reportlab` for PDF, `openpyxl` for Excel), you MUST install them at the very top of your script using `import subprocess; subprocess.run(['pip', 'install', 'python-docx', 'fpdf2', 'openpyxl', 'reportlab'])`.
 3. If making a PDF with fpdf2, handle Unicode text safely and DO NOT use custom header/footer methods that reference uninitialized variables (e.g. `self.title`). Call `add_page()` only AFTER setting necessary titles, or just keep the script extremely simple without custom headers.
-3. You MUST save the final generated file in the current working directory.
-4. Output ONLY the raw Python code enclosed in ```python ... ``` tags. Do not include any other explanations.
-5. DO NOT hardcode the entire raw context text into your script. Instead, analyze the text yourself and hardcode ONLY the final extracted key points, summaries, or insights as small Python data structures (like lists of dictionaries) inside the script.
+4. You MUST save the final generated file in the current working directory.
+5. Output ONLY the raw Python code enclosed in ```python ... ``` tags. Do not include any other explanations.
+6. DO NOT hardcode the entire raw context text into your script. Instead, analyze the text yourself and hardcode ONLY the final extracted key points, summaries, or insights as small Python data structures (like lists of dictionaries) inside the script.
+7. CRITICAL: If the user asks you to generate a file containing information, topics, or data that is NOT found in the provided Source Document Context, you MUST completely refuse to write the script. Instead, output the exact string "REJECT: OUT_OF_CONTEXT" and nothing else.
 
 Here is the entire Chat History up to this point:
 {chat_history}
@@ -54,6 +55,10 @@ Here is the Source Document Context:
     ])
     logger.info(f"[AGENT] Raw LLM Response:\n{response.content}\n-----------------------")
     
+    if "REJECT: OUT_OF_CONTEXT" in response.content.upper():
+        logger.warning("[AGENT] Rejected out of context request.")
+        return "I can only generate files and reports based on the content you uploaded. Please ask a question related to the source document."
+
     # 2. Extract code
     code_match = re.search(r'```python\n(.*?)\n```', response.content, re.DOTALL)
     if not code_match:
