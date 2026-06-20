@@ -8,7 +8,8 @@ load_dotenv()
 
 
 def get_llm():
-    return ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.2, max_tokens=2048)
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    return ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.2, max_tokens=2048, google_api_key=api_key)
 
 
 def build_chain():
