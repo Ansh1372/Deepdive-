@@ -32,7 +32,8 @@ Your task is to write a Python script that generates a highly-formatted file (e.
 
 Requirements:
 1. Pay close attention to the EXACT file format the user requests (e.g., if they ask for a PDF, generate a .pdf; if Word, generate .docx; if Excel, generate .xlsx).
-2. If you need third-party libraries (like `python-docx` for Word, `fpdf` or `reportlab` for PDF, `openpyxl` for Excel), you MUST install them at the very top of your script using `import subprocess; subprocess.run(['pip', 'install', 'python-docx', 'fpdf', 'openpyxl'])`.
+2. If you need third-party libraries (like `python-docx` for Word, `fpdf2` or `reportlab` for PDF, `openpyxl` for Excel), you MUST install them at the very top of your script using `import subprocess; subprocess.run(['pip', 'install', 'python-docx', 'fpdf2', 'openpyxl', 'reportlab'])`.
+3. If making a PDF, ensure you handle Unicode text properly (e.g., replace smart quotes, em-dashes, or use a Unicode-friendly library/font).
 3. You MUST save the final generated file in the current working directory.
 4. Output ONLY the raw Python code enclosed in ```python ... ``` tags. Do not include any other explanations.
 5. DO NOT hardcode the entire raw context text into your script. Instead, analyze the text yourself and hardcode ONLY the final extracted key points, summaries, or insights as small Python data structures (like lists of dictionaries) inside the script.
