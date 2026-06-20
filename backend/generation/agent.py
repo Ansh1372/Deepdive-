@@ -96,7 +96,7 @@ Here is the Source Document Context:
             logger.info(f"[AGENT] File downloaded successfully: {unique_filename}")
             
             # Return the markdown link
-            return f"Your report has been generated successfully! \n\n[Download {target_file.name} here](/downloads/{unique_filename})"
+            return f"Your report has been generated successfully! \n\n[Download {target_file.name} here](http://localhost:8001/downloads/{unique_filename})"
             
     except Exception as e:
         logger.error(f"[AGENT] Sandbox connection/execution failed: {e}")
