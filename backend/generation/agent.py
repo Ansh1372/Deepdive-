@@ -35,6 +35,7 @@ Requirements:
 2. If making an Excel file, apply nice formatting (bold headers, adjusted column widths).
 3. You MUST save the final generated file in the current directory (e.g., `report.xlsx`, `summary.pdf`).
 4. Output ONLY the raw Python code enclosed in ```python ... ``` tags. Do not include any other explanations.
+5. DO NOT hardcode the entire raw context text into your script. Instead, analyze the text yourself and hardcode ONLY the final extracted key points, summaries, or insights as small Python data structures (like lists of dictionaries) inside the script.
 
 Here is the entire Chat History up to this point:
 {chat_history}
