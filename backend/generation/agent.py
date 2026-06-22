@@ -52,6 +52,7 @@ Your task is to write a Python script that generates a stunning, well-designed f
 3. For Excel files using openpyxl:
     - NEVER use characters `\ / ? * [ ]` in sheet titles (`ws.title`). Replace them with hyphens (e.g., '50-30-20 Rule').
     - NEVER try to import `RGBColor` from `openpyxl.styles.colors` (it will crash). To color cells, use `from openpyxl.styles import PatternFill, Font` and apply `PatternFill(start_color='HEXCODE', fill_type='solid')`.
+    - NEVER iterate directly over a slice like `for cell in ws['A1:E1']:`. A slice returns a tuple of rows! You MUST do: `for row in ws['A1:E1']: for cell in row: cell.fill = ...`
 4. Color palette suggestion for professional look: Dark navy (#1a237e), bright teal (#00bcd4), white text on dark headers, light gray (#f5f5f5) for alternating rows. (For openpyxl, use HEX without the #).
 5. You MUST save the file in the current working directory.
 6. Output ONLY raw Python code in ```python ... ``` tags. No other text.

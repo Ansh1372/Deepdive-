@@ -35,10 +35,10 @@ def get_llm(purpose="heavy"):
             max_tokens  = 1024
         elif purpose == "code":
             # Code generation needs space. Groq free tier limit is 6000 TPM (Prompt + Max Tokens).
-            # We set max_tokens=3000, leaving 3000 tokens for the prompt.
+            # We set max_tokens=2000, leaving 4000 tokens for the prompt, which is crucial for retries.
             model_name  = "llama-3.1-8b-instant"
             temperature = 0.2
-            max_tokens  = 3000
+            max_tokens  = 2000
         else:  # "heavy"
             model_name  = "llama-3.3-70b-versatile"
             temperature = 0.2
