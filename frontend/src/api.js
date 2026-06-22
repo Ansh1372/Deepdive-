@@ -81,8 +81,8 @@ export async function chatStream(question, sessionId, onChunk, onSources, onDone
         const data = line.slice(6);
         if (data === "[DONE]") {
           onDone();
-        } else if (data.startsWith("[{")) {
-          // This is sources JSON
+        } else if (data === "[]" || data.startsWith("[{")) {
+          // This is sources JSON — either empty [] or [{...}] with sources
           try {
             const sources = JSON.parse(data);
             onSources(sources);
