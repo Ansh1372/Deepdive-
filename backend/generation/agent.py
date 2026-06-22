@@ -93,6 +93,13 @@ def execute_code_node(state: AgentState):
         
     try:
         with Sandbox(api_key=e2b_api_key) as sandbox:
+            # Pre-install common document libraries so the generated code can import them
+            logger.info("[AGENT] Installing packages in sandbox...")
+            sandbox.commands.run(
+                "pip install reportlab openpyxl python-docx -q",
+                timeout=120
+            )
+            logger.info("[AGENT] Packages installed. Running code...")
             execution = sandbox.run_code(state["code"])
             
             if execution.error:
