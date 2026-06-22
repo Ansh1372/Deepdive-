@@ -78,7 +78,7 @@ def execute_code_node(state: AgentState):
         return {"error": "E2B Sandbox is not configured properly.", "iterations": state["iterations"] + 1}
         
     try:
-        with Sandbox.create() as sandbox:
+        with Sandbox(api_key=e2b_api_key) as sandbox:
             execution = sandbox.run_code(state["code"])
             
             if execution.error:
