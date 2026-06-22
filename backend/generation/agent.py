@@ -68,8 +68,13 @@ Here is the Source Document Context:
     if state.get("error"):
         user_prompt += f"\n\nCRITICAL: Your previous code execution FAILED with the following error:\n{state['error']}\n\nPlease analyze the error, fix your code, and try again. Output the full corrected code."
         
+    # Truncate context to ~2500 tokens (10000 chars) to prevent 413 Rate Limit on Groq free tier
+    safe_context = state["context"]
+    if len(safe_context) > 10000:
+        safe_context = safe_context[:10000] + "\n...[Context truncated due to rate limits]..."
+
     response = llm.invoke([
-        SystemMessage(content=system_prompt.format(chat_history=state["chat_history"], context=state["context"])),
+        SystemMessage(content=system_prompt.format(chat_history=state["chat_history"], context=safe_context)),
         HumanMessage(content=user_prompt)
     ])
     
