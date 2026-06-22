@@ -1,3 +1,13 @@
+---
+title: Deepdive
+emoji: 🔍
+colorFrom: indigo
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Deepdive — AI-Powered Content Q&A
 
 > Chat with any YouTube video, webpage, or PDF using a production-grade RAG pipeline powered by LLaMA 3.3 70B.
