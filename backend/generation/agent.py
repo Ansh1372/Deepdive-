@@ -49,9 +49,10 @@ Your task is to write a Python script that generates a stunning, well-designed f
    - Create colorful Tables with `TableStyle` using `BACKGROUND`, `TEXTCOLOR`, `FONTNAME`, `GRID`.
    - Use `colors.HexColor('#XXXXXX')` for beautiful color palettes.
    - For a title banner, create a Table with a colored background, white text, and padding.
-3. Color palette suggestion for professional look: Dark navy (#1a237e), bright teal (#00bcd4), white text on dark headers, light gray (#f5f5f5) for alternating rows.
-4. You MUST save the file in the current working directory.
-5. Output ONLY raw Python code in ```python ... ``` tags. No other text.
+3. For Excel files using openpyxl, NEVER use characters `\ / ? * [ ]` in sheet titles (`ws.title`), as this will crash openpyxl with a ValueError.
+4. Color palette suggestion for professional look: Dark navy (#1a237e), bright teal (#00bcd4), white text on dark headers, light gray (#f5f5f5) for alternating rows.
+5. You MUST save the file in the current working directory.
+6. Output ONLY raw Python code in ```python ... ``` tags. No other text.
 
 === DATA RULES ===
 6. DO NOT dump raw context text into the script. Extract key insights, structure them into Python lists/dicts, and use that structured data to build the document.
