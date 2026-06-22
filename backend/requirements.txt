@@ -5,8 +5,7 @@ langchain-text-splitters==0.3.2
 langchain-groq==0.2.2
 langchain-community==0.3.9
 langchain-huggingface==0.1.2
-langgraph
-faiss-cpu==1.9.0
+langgraph==0.2.69
 faiss-cpu==1.9.0
 python-dotenv==1.0.1
 redis==5.2.1
@@ -26,7 +25,7 @@ ragas==0.2.8
 datasets==3.2.0
 slowapi==0.1.9
 requests==2.32.3
-e2b_code_interpreter
-pandas
-openpyxl
-matplotlib
+e2b_code_interpreter==1.0.4
+pandas==2.2.3
+openpyxl==3.1.5
+matplotlib==3.9.4
