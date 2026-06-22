@@ -103,7 +103,14 @@ def execute_code_node(state: AgentState):
             with open(local_path, "wb") as f:
                 f.write(file_bytes)
                 
-            final_response = f"Your report has been generated successfully! \n\n[Download {target_file.name} here](http://localhost:8001/downloads/{unique_filename})"
+            # Build correct download URL — HF sets SPACE_HOST automatically
+            space_host = os.getenv("SPACE_HOST")
+            if space_host:
+                base_url = f"https://{space_host}"
+            else:
+                base_url = "http://localhost:8001"
+            
+            final_response = f"Your report has been generated successfully! \n\n[Download {target_file.name} here]({base_url}/downloads/{unique_filename})"
             return {"final_response": final_response, "error": None}
             
     except Exception as e:
