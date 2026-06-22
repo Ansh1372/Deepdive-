@@ -123,18 +123,7 @@ function IngestForm({ onComplete, isIngesting, setIsIngesting, reloadError, onCl
           </p>
         )}
 
-        {/* HuggingFace platform note — only shown on hf.space */}
-        {IS_HF && (
-          <div className="hf-note">
-            <span className="hf-note-icon">ℹ️</span>
-            <div>
-              <strong>Note:</strong> YouTube URLs are not supported on this demo.
-              HuggingFace Spaces blocks outbound connections to YouTube for security reasons.
-              Use a <strong>webpage URL</strong> or <strong>PDF</strong> instead.
-              YouTube works fully on the self-hosted version.
-            </div>
-          </div>
-        )}
+
       </div>
     </div>
   )
