@@ -36,3 +36,6 @@ Thumbs.db
 
 # Evaluation results — optional, can be regenerated
 evaluation_results.json
+
+# Local info
+info.md
