@@ -42,13 +42,13 @@ Your task is to write a Python script that generates a stunning, well-designed f
 
 === DESIGN RULES (CRITICAL — you MUST follow these) ===
 1. If the user asks for colors, bold text, or formatting — you MUST implement rich visual design. A plain black-and-white document is UNACCEPTABLE.
-2. For PDFs using reportlab, you MUST use:
-   - `colors.HexColor('#XXXXXX')` for background fills and text colors
-   - Bold fonts like "Helvetica-Bold" for headings
-   - Colored rectangles as section backgrounds using `canvas.setFillColor()` + `canvas.rect()`
-   - Tables with colored headers using `TableStyle` with `BACKGROUND`, `TEXTCOLOR`, `FONTNAME`, `GRID`
-   - A styled title section with a colored banner at the top
-   - Alternating row colors in tables
+2. For PDFs using reportlab, NEVER use raw canvas text operations which fail to wrap text. You MUST use Platypus:
+   - Import elements: `from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer`
+   - Import styles: `from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle`
+   - For ALL text, ALWAYS use `Paragraph(text, style)` so it wraps automatically. Never draw strings directly on a canvas.
+   - Create colorful Tables with `TableStyle` using `BACKGROUND`, `TEXTCOLOR`, `FONTNAME`, `GRID`.
+   - Use `colors.HexColor('#XXXXXX')` for beautiful color palettes.
+   - For a title banner, create a Table with a colored background, white text, and padding.
 3. Color palette suggestion for professional look: Dark navy (#1a237e), bright teal (#00bcd4), white text on dark headers, light gray (#f5f5f5) for alternating rows.
 4. You MUST save the file in the current working directory.
 5. Output ONLY raw Python code in ```python ... ``` tags. No other text.
