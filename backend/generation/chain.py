@@ -10,40 +10,52 @@ load_dotenv()
 
 def get_llm(purpose="heavy"):
     """
-    Returns an LLM depending on the purpose to save tokens and speed up background tasks.
-    purpose="heavy": For complex reasoning (Main chat, Agent coding) -> uses LLaMA 3.3 70B
-    purpose="fast": For quick classification/routing -> uses LLaMA 3.1 8B
+    Returns an LLM depending on the purpose.
+    purpose="heavy": Complex reasoning / main chat         → LLaMA 3.3 70B, 2048 tokens
+    purpose="fast":  Quick classification/routing          → LLaMA 3.1 8B,  1024 tokens
+    purpose="code":  Agent code generation (needs space)   → LLaMA 3.1 8B,  8192 tokens
     """
     groq_api_key = os.getenv("GROQ_API_KEY")
     gemini_api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-    
-    # Define fallback model
+
+    # Gemini fallback (for rate limit overflows)
     gemini_fallback = None
     if gemini_api_key:
-        gemini_fallback = ChatGoogleGenerativeAI(model="gemini-flash-latest", temperature=0.2, max_output_tokens=8192, google_api_key=gemini_api_key)
+        gemini_fallback = ChatGoogleGenerativeAI(
+            model="gemini-2.0-flash",
+            temperature=0.2,
+            max_output_tokens=8192,
+            google_api_key=gemini_api_key,
+        )
 
     if groq_api_key:
         if purpose == "fast":
-            model_name = "llama-3.1-8b-instant"
+            model_name  = "llama-3.1-8b-instant"
             temperature = 0.1
-        else:
-            model_name = "llama-3.1-8b-instant"
+            max_tokens  = 1024
+        elif purpose == "code":
+            # Code generation needs large output space — 8B is fast & generous on quota
+            model_name  = "llama-3.1-8b-instant"
             temperature = 0.2
-            
+            max_tokens  = 8192
+        else:  # "heavy"
+            model_name  = "llama-3.3-70b-versatile"
+            temperature = 0.2
+            max_tokens  = 2048
+
         groq_model = ChatGroq(
             model=model_name,
             temperature=temperature,
-            max_tokens=1024,
-            groq_api_key=groq_api_key
+            max_tokens=max_tokens,
+            groq_api_key=groq_api_key,
         )
-        
-        # If Gemini is configured, use it as a safety net for rate limits
+
         if gemini_fallback:
             return groq_model.with_fallbacks([gemini_fallback])
-            
         return groq_model
-    else:
-        return gemini_fallback
+
+    return gemini_fallback
+
 
 
 def build_chain():

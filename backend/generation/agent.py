@@ -28,7 +28,7 @@ class AgentState(TypedDict):
     final_response: Optional[str]
 
 def generate_code_node(state: AgentState):
-    llm = get_llm()
+    llm = get_llm(purpose="code")  # needs high max_tokens for complex code generation
     logger.info(f"[AGENT] Generating code (Iteration {state['iterations'] + 1})")
     
     system_prompt = """You are an expert Python developer specializing in creating beautiful, professional, colorful documents.
