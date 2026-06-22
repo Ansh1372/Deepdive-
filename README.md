@@ -29,6 +29,8 @@ Paste a YouTube URL, webpage link, or upload a PDF. Deepdive ingests the content
 
 When the ingested content isn't enough to answer your question, the system automatically falls back to a live DuckDuckGo web search — no manual switching needed.
 
+**🤖 Agentic Document Generation:** Deepdive features an autonomous LangGraph agent powered by E2B code interpreter sandboxes. You can ask it to "Generate a colorful PDF summary", "Export to Excel", or "Create a Word document" and the agent will write, execute, and return the generated file via an isolated sandbox.
+
 ---
 
 ## Demo
