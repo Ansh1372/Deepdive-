@@ -34,10 +34,15 @@ def get_llm(purpose="heavy"):
             temperature = 0.1
             max_tokens  = 1024
         elif purpose == "code":
-            # Code generation needs large output space — 8B is fast & generous on quota
+            # Code generation needs space. Groq free tier limit is 6000 TPM (Prompt + Max Tokens).
+            # If we set max_tokens=8192, Groq immediately blocks it with 413 Rate Limit.
+            # So if Gemini is available, use Gemini directly for code generation.
+            if gemini_fallback:
+                return gemini_fallback
+            
             model_name  = "llama-3.1-8b-instant"
             temperature = 0.2
-            max_tokens  = 8192
+            max_tokens  = 4000  # Leaves 2000 for prompt context before hitting 6k limit
         else:  # "heavy"
             model_name  = "llama-3.3-70b-versatile"
             temperature = 0.2
