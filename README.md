@@ -94,7 +94,7 @@ When the ingested content isn't enough to answer your question, the system autom
 | Orchestration | LangChain & LangGraph |
 | Code Interpreter | E2B Data Analysis Sandboxes |
 | Session Storage | Redis (chat history, 24h TTL) |
-| YouTube | `youtube-transcript-api` |
+| YouTube | `yt-dlp` (local) + Supadata API proxy (HuggingFace) |
 | Web Scraping | Trafilatura |
 | Image Understanding | Google Gemini 2.5 Flash (optional) |
 | PDF Parsing | pdfplumber |
@@ -202,6 +202,7 @@ First build takes ~10 minutes (downloads ML models). Subsequent builds use cache
 | `POST` | `/ingest` | Ingest a URL (YouTube / webpage) |
 | `POST` | `/upload-pdf` | Upload and ingest a PDF file |
 | `POST` | `/chat` | Stream chat response (SSE) |
+| `GET` | `/downloads/{filename}` | Download agent-generated files (PDF, Excel, CSV) |
 | `GET` | `/sessions` | List all cached sessions |
 | `GET` | `/metrics` | Observability metrics (requests, latency, P95) |
 
@@ -245,6 +246,8 @@ Results saved to `evaluation_results.json`.
 |----------|----------|-------------|
 | `GROQ_API_KEY` | ✅ Yes | Groq API key for LLaMA 3.3 70B |
 | `GEMINI_API_KEY` | Optional | Enables image understanding on web pages |
+| `E2B_API_KEY` | Optional | E2B sandbox for agentic file generation (Excel/PDF/CSV) |
+| `SUPADATA_API_KEY` | Optional | YouTube transcript proxy — **required for YouTube on HuggingFace** (free tier: 100/day at [supadata.ai](https://supadata.ai)) |
 | `REDIS_URL` | Auto-set | Set by Docker Compose — `redis://redis:6379` |
 
 ---
