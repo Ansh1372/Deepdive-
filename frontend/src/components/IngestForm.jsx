@@ -113,6 +113,7 @@ function IngestForm({ onComplete, isIngesting, setIsIngesting, reloadError, onCl
             <span className="hint-chip">📰 Blog posts</span>
             <span className="hint-chip">📚 Documentation</span>
             <span className="hint-chip">📄 PDF files</span>
+            <span className="hint-chip">🤖 Agentic Document Gen</span>
           </div>
         )}
 
