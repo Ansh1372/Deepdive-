@@ -140,7 +140,9 @@ def execute_code_node(state: AgentState):
             else:
                 base_url = "http://localhost:8001"
             
-            final_response = f"Your report has been generated successfully! \n\n[Download {target_file.name} here]({base_url}/downloads/{unique_filename})"
+            import urllib.parse
+            encoded_filename = urllib.parse.quote(unique_filename)
+            final_response = f"Your report has been generated successfully! \n\n[Download {target_file.name} here]({base_url}/downloads/{encoded_filename})"
             return {"final_response": final_response, "error": None}
             
     except Exception as e:
